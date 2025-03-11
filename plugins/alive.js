@@ -51,10 +51,15 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // Wait for 2 seconds before sending image + text
         await new Promise(resolve => setTimeout(resolve, 2000));
 
-        // 2. Send Image + Caption After Voice
+        // 2. Send Image + Caption + Buttons After Voice
         await conn.sendMessage(from, {
             image: { url: `https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg` }, // Image URL
             caption: status,
+            footer: 'Select an option below:',
+            templateButtons: [
+                { index: 1, quickReplyButton: { displayText: "📊 Ping", id: "ping" } },
+                { index: 2, quickReplyButton: { displayText: "📜 Menu", id: "menu" } }
+            ],
             contextInfo: {
                 mentionedJid: [m.sender],
                 forwardingScore: 999,
