@@ -5,14 +5,14 @@ const { runtime } = require('../lib/functions');
 cmd({
     pattern: "alive",
     alias: ["status", "runtime", "uptime"],
-    desc: "Check bot status with buttons and voice",
+    desc: "Check bot status with buttons, voice, and channel view",
     category: "main",
     react: "📟",
     filename: __filename
 },
 async (conn, mek, m, { from, reply }) => {
     try {
-        // Alive message content
+        // Alive Message Content
         const status = `╭━━〔 *D-XTRO-MD* 〕━━┈⊷
 ┃◈╭─────────────·๏
 ┃◈┃• *⏳ Uptime*: ${runtime(process.uptime())}
@@ -21,23 +21,31 @@ async (conn, mek, m, { from, reply }) => {
 ┃◈┃• *🧬 Version*: V2 BETA
 ┃◈└───────────┈⊷
 ╰──────────────┈⊷
-🚀 I'm Alive & Ready to Assist You!
+🚀 I'm Alive & Ready to Assist You!`;
 
-👉 [Visit Channel](https://whatsapp.com/channel/0029Vb0Anqe9RZAcEYc2fT2c)`;
-
-        // Send Image + Text + Buttons + Voice
+        // Send Image + Caption + Button + Channel View
         await conn.sendMessage(from, {
-            image: { url: 'https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg' }, // Image URL
+            image: { url: 'https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg' },
             caption: status,
             footer: "D-XTRO-MD",
             buttons: [
                 { buttonId: 'ping', buttonText: { displayText: '🏓 Ping' }, type: 1 },
                 { buttonId: 'menu', buttonText: { displayText: '📜 Menu' }, type: 1 }
             ],
-            headerType: 4
+            headerType: 4,
+            contextInfo: {
+                externalAdReply: {
+                    title: "Join Our Channel",
+                    body: "Click to View Channel",
+                    mediaType: 1,
+                    thumbnailUrl: "https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg",
+                    mediaUrl: "https://whatsapp.com/channel/0029Vb0Anqe9RZAcEYc2fT2c",
+                    sourceUrl: "https://whatsapp.com/channel/0029Vb0Anqe9RZAcEYc2fT2c"
+                }
+            }
         }, { quoted: mek });
 
-        // Send Voice Message (PTT)
+        // Send Voice (PTT) with Channel View
         await conn.sendMessage(from, {
             audio: { url: 'https://github.com/mrdinesh595/Mssadu/raw/refs/heads/main/database/dxtro%20alive.mp3' },
             mimetype: 'audio/mp4',
