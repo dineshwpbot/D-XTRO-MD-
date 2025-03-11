@@ -20,7 +20,7 @@ module.exports = {
         };
 
         // Voice message
-        const voicePath = path.resolve(__dirname, 'data/autovoicereply.opus'); // Replace with the path to your voice note
+        const voicePath = path.resolve(__dirname, 'media/voice_note.opus'); // Replace with the path to your voice note
         const voiceBuffer = fs.readFileSync(voicePath);
         const voiceMessage = await prepareWAMessageMedia({ audio: voiceBuffer, mimetype: 'audio/ogg; codecs=opus' }, { upload: sock.waUploadToServer });
 
