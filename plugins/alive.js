@@ -1,79 +1,61 @@
-const { cmd, commands } = require('../command');
+const { cmd } = require('../command');
 const os = require("os");
 const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "alive",
     alias: ["status", "runtime", "uptime"],
-    desc: "Check uptime and system status",
+    desc: "Check bot status with voice and buttons",
     category: "main",
     react: "📟",
     filename: __filename
 },
-async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+async (conn, mek, m, { from, reply }) => {
     try {
-        // System status message
+        // Alive message content
         const status = `╭━━〔 *D-XTRO-MD* 〕━━┈⊷
 ┃◈╭─────────────·๏
-┃◈┃• *⏳Uptime*:  ${runtime(process.uptime())} 
-┃◈┃• *📟 Ram usage*: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${(os.totalmem() / 1024 / 1024).toFixed(2)}MB
-┃◈┃• *⚙️ HostName*: ${os.hostname()}
+┃◈┃• *⏳ Uptime*:  ${runtime(process.uptime())}
+┃◈┃• *📟 Ram Usage*: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${(os.totalmem() / 1024 / 1024).toFixed(2)}MB
 ┃◈┃• *👨‍💻 Owner*: ᴍʀ ᴅɪɴᴇꜱʜ
 ┃◈┃• *🧬 Version*: V2 BETA
 ┃◈└───────────┈⊷
 ╰──────────────┈⊷
+🚀 I'm Alive & Ready to Assist You!
+👉 [Visit Channel](https://whatsapp.com/channel/0029Vb0Anqe9RZAcEYc2fT2c)`;
 
-  𝐪𝐮𝐞𝐞𝐧 𝐬𝐚𝐝𝐮 programing.𝐢𝐦 𝐚𝐥𝐢𝐯𝐞 𝐧𝐨𝐰. 
-
-  https://whatsapp.com/channel/0029Vb0Anqe9RZAcEYc2fT2c
-
-> © ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴍʀ ᴅɪɴᴇꜱʜ`;
-
-        // Voice message URL (PTT voice message)
+        // Voice message link (replace with your link)
         const voiceUrl = 'https://github.com/mrdinesh595/Mssadu/raw/refs/heads/main/database/dxtro%20alive.mp3';
 
-        // ✅ 1. Send Voice (PTT) First
+        // Sending combined message with voice & buttons
         await conn.sendMessage(from, {
-            audio: { url: voiceUrl },
-            mimetype: 'audio/mpeg',
-            ptt: true, // Send as voice message (PTT)
+            image: { url: 'https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg' }, // Image URL
+            caption: status,
+            buttons: [
+                { buttonId: 'ping', buttonText: { displayText: '🏓 Ping' }, type: 1 },
+                { buttonId: 'menu', buttonText: { displayText: '📜 Menu' }, type: 1 }
+            ],
+            headerType: 4,
             contextInfo: {
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363357105376275@g.us@newsletter',
-                    newsletterName: 'ᴍʀ ᴅɪɴᴇꜱʜ',
-                    serverMessageId: 143
+                externalAdReply: {
+                    title: 'D-XTRO-MD',
+                    body: 'Click here to visit channel',
+                    mediaType: 2,
+                    thumbnailUrl: 'https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg',
+                    mediaUrl: 'https://whatsapp.com/channel/0029Vb0Anqe9RZAcEYc2fT2c'
                 }
             }
         }, { quoted: mek });
 
-        // ✅ 2. Wait for 2 seconds to avoid overlapping issues
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        // ✅ 3. Send Image + Text + Buttons
+        // Send the voice message
         await conn.sendMessage(from, {
-            image: { url: `https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg` }, // Image URL
-            caption: status,
-            footer: 'Select an option below:',
-            templateButtons: [
-                { index: 1, quickReplyButton: { displayText: "📊 Ping", id: "ping" } },
-                { index: 2, quickReplyButton: { displayText: "📜 Menu", id: "menu" } }
-            ],
-            contextInfo: {
-                mentionedJid: [m.sender],
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363357105376275@g.us@newsletter',
-                    newsletterName: 'ᴍʀ ᴅɪɴᴇꜱʜ',
-                    serverMessageId: 143
-                }
-            }
+            audio: { url: voiceUrl },
+            mimetype: 'audio/mp4',
+            ptt: true
         }, { quoted: mek });
 
     } catch (e) {
         console.error("Error in alive command:", e);
-        reply(`⚠️ Error occurred: ${e.message}`);
+        reply(`An error occurred: ${e.message}`);
     }
 });
