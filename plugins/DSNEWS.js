@@ -9,7 +9,7 @@ let lastNewsTitles = {};
 
 async function getLatestNews() {
     let newsData = [];
-    
+
     // Hiru News
     try {
         const hiruApi = new Hiru();
@@ -17,7 +17,8 @@ async function getLatestNews() {
         newsData.push({
             title: hiruNews.results.title,
             content: hiruNews.results.news,
-            date: hiruNews.results.date
+            date: hiruNews.results.date,
+            image: hiruNews.results.image  // Assuming 'image' field exists
         });
     } catch (err) {
         console.error(`Error fetching Hiru News: ${err.message}`);
@@ -31,7 +32,8 @@ async function getLatestNews() {
             newsData.push({
                 title: esanaNews.title,
                 content: esanaNews.description,
-                date: esanaNews.publishedAt
+                date: esanaNews.publishedAt,
+                image: esanaNews.image || '' // Assuming 'image' field exists or use an empty string
             });
         } else {
             console.error("Error: Esana News returned invalid data.");
@@ -52,9 +54,15 @@ async function checkAndPostNews(conn, groupId) {
         }
 
         if (!lastNewsTitles[groupId].includes(newsItem.title)) {
-           await conn.sendMessage(groupId, { 
-                text: `*🔵𝐍𝐄𝐖𝐒 𝐀𝐋𝐄𝐑𝐓!*\n██████████████████████████████████████████\n\n\n📰 *${newsItem.title}*\n${newsItem.content}\n\n${newsItem.date}\n\n> *©ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴍʀ ᴅɪɴᴇꜱʜ ᴏꜰᴄ*\n> *QUEEN-SADU-MD & D-XTRO-MD*` 
-            });
+           const messageContent = {
+                text: `*🔵𝐍𝐄𝐖𝐒 𝐀𝐋𝐄𝐑𝐓!*\n██████████████████████████████████████████\n\n\n📰 *${newsItem.title}*\n${newsItem.content}\n\n${newsItem.date}\n\n> *©ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴍʀ ᴅɪɴᴇꜱʜ ᴏꜰᴄ*\n> *QUEEN-SADU-MD & D-XTRO-MD*`
+            };
+
+            if (newsItem.image) {
+                messageContent['image'] = { url: newsItem.image };  // Sending image along with text
+            }
+
+            await conn.sendMessage(groupId, messageContent);
             lastNewsTitles[groupId].push(newsItem.title);
 
             if (lastNewsTitles[groupId].length > 100) {
@@ -63,7 +71,6 @@ async function checkAndPostNews(conn, groupId) {
         }
     });
 }
-
 
 // Command to activate the general news service in the group
 cmd({
@@ -91,7 +98,7 @@ cmd({
                                     await checkAndPostNews(conn, groupId);
                                 }
                             }
-                        }, 60000); // Check for news every 60 seconds
+                        }, 900000); // Check for news every 15 minutes
                     }
 
                 } else {
