@@ -32,7 +32,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // Voice message URL (PTT voice message)
         const voiceUrl = 'https://github.com/mrdinesh595/Mssadu/raw/refs/heads/main/database/dxtro%20alive.mp3';
 
-        // Send PTT Voice + Image + Text + Buttons in one message
+        // ✅ 1. Send Voice (PTT) First
         await conn.sendMessage(from, {
             audio: { url: voiceUrl },
             mimetype: 'audio/mpeg',
@@ -48,10 +48,10 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
             }
         }, { quoted: mek });
 
-        // Wait for 2 seconds to sync voice before sending the rest
+        // ✅ 2. Wait for 2 seconds to avoid overlapping issues
         await new Promise(resolve => setTimeout(resolve, 2000));
 
-        // Send Image + Caption + Buttons
+        // ✅ 3. Send Image + Text + Buttons
         await conn.sendMessage(from, {
             image: { url: `https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg` }, // Image URL
             caption: status,
@@ -74,6 +74,6 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 
     } catch (e) {
         console.error("Error in alive command:", e);
-        reply(`An error occurred: ${e.message}`);
+        reply(`⚠️ Error occurred: ${e.message}`);
     }
 });
