@@ -29,6 +29,9 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 
 > © ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴍʀ ᴅɪɴᴇꜱʜ`;
 
+        // Voice message URL (Add your MP3 link here)
+        const voiceUrl = 'https://your-voice-file-link.com/alive_voice.mp3';
+
         // Send the status message with an image
         await conn.sendMessage(from, { 
             image: { url: `https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg` },  // Image URL
@@ -44,6 +47,15 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
                 }
             }
         }, { quoted: mek });
+
+        // Send the voice message using MP3 URL
+        if (voiceUrl) {
+            await conn.sendMessage(from, {
+                audio: { url: voiceUrl },
+                mimetype: 'audio/mpeg',
+                ptt: true // Push-to-talk (voice message style)
+            }, { quoted: mek });
+        }
 
     } catch (e) {
         console.error("Error in alive command:", e);
