@@ -29,16 +29,13 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 
 > © ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴍʀ ᴅɪɴᴇꜱʜ`;
 
-        // Voice message URL (Your provided link)
+        // Voice message URL
         const voiceUrl = 'https://github.com/mrdinesh595/Mssadu/raw/refs/heads/main/database/dxtro%20alive.mp3';
 
-        // Send the combined message (Image + Text + Voice)
-        await conn.sendMessage(from, {
-            image: { url: `https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg` },  // Image URL
+        // Send the status message with an image
+        await conn.sendMessage(from, { 
+            image: { url: `https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg` },  
             caption: status,
-            audio: { url: voiceUrl },
-            mimetype: 'audio/mpeg',
-            ptt: true, // Push-to-talk (voice message style)
             contextInfo: {
                 mentionedJid: [m.sender],
                 forwardingScore: 999,
@@ -49,6 +46,16 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
                     serverMessageId: 143
                 }
             }
+        }, { quoted: mek });
+
+        // Wait a bit before sending the voice message
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Send the voice message
+        await conn.sendMessage(from, {
+            audio: { url: voiceUrl },
+            mimetype: 'audio/mpeg',
+            ptt: true 
         }, { quoted: mek });
 
     } catch (e) {
