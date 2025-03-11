@@ -32,10 +32,13 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // Voice message URL
         const voiceUrl = 'https://github.com/mrdinesh595/Mssadu/raw/refs/heads/main/database/dxtro%20alive.mp3';
 
-        // Send the alive message (Image + Text + Voice in one message)
+        // Send the alive message (Image + Text + Voice in one message using document method)
         await conn.sendMessage(from, {
             image: { url: `https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg` }, // Image URL
             caption: status, // Alive text message
+            document: { url: voiceUrl }, // Voice message as a document
+            mimetype: 'audio/mpeg',
+            fileName: 'alive.mp3',
             contextInfo: {
                 mentionedJid: [m.sender],
                 forwardingScore: 999,
@@ -46,16 +49,6 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
                     serverMessageId: 143
                 }
             }
-        }, { quoted: mek });
-
-        // Wait for 1 second and then send the voice
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Send the voice message
-        await conn.sendMessage(from, {
-            audio: { url: voiceUrl },
-            mimetype: 'audio/mpeg',
-            ptt: true // Send as voice message
         }, { quoted: mek });
 
     } catch (e) {
