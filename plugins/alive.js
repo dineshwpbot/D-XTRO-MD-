@@ -12,7 +12,7 @@ cmd({
 },
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        // Generate system status message
+        // System status message
         const status = `╭━━〔 *D-XTRO-MD* 〕━━┈⊷
 ┃◈╭─────────────·๏
 ┃◈┃• *⏳Uptime*:  ${runtime(process.uptime())} 
@@ -29,16 +29,13 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 
 > © ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴍʀ ᴅɪɴᴇꜱʜ`;
 
-        // Voice message URL
+        // Voice message URL (PTT voice message)
         const voiceUrl = 'https://github.com/mrdinesh595/Mssadu/raw/refs/heads/main/database/dxtro%20alive.mp3';
 
-        // Send the alive message (Image + Text + Voice in one message using document method)
-        await conn.sendMessage(from, {
+        // Send Image + Caption First
+        const sentMessage = await conn.sendMessage(from, {
             image: { url: `https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg` }, // Image URL
-            caption: status, // Alive text message
-            document: { url: voiceUrl }, // Voice message as a document
-            mimetype: 'audio/mpeg',
-            fileName: 'alive.mp3',
+            caption: status,
             contextInfo: {
                 mentionedJid: [m.sender],
                 forwardingScore: 999,
@@ -50,6 +47,13 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
                 }
             }
         }, { quoted: mek });
+
+        // Send PTT Voice linked to the Image + Text
+        await conn.sendMessage(from, {
+            audio: { url: voiceUrl },
+            mimetype: 'audio/mpeg',
+            ptt: true // Send as voice message (PTT)
+        }, { quoted: sentMessage });
 
     } catch (e) {
         console.error("Error in alive command:", e);
