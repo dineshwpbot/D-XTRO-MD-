@@ -30,7 +30,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 > © ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴍʀ ᴅɪɴᴇꜱʜ`;
 
         // Voice message URL (Add your MP3 link here)
-        const voiceUrl = 'https://your-voice-file-link.com/alive_voice.mp3';
+        const voiceUrl = 'alive":"https://github.com/mrdinesh595/Mssadu/raw/refs/heads/main/database/dxtro%20alive.mp3';
 
         // Send the status message with an image
         await conn.sendMessage(from, { 
