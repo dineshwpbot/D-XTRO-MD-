@@ -24,28 +24,20 @@ async (conn, mek, m, { from, reply }) => {
 🚀 I'm Alive & Ready to Assist You!
 👉 [Visit Channel](https://whatsapp.com/channel/0029Vb0Anqe9RZAcEYc2fT2c)`;
 
-        // Send combined message with Image + Text + Buttons
+        // Send message with Image + Text + Buttons
         await conn.sendMessage(from, {
             image: { url: 'https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg' }, // Image URL
             caption: status,
+            footer: "D-XTRO-MD",
             buttons: [
                 { buttonId: 'ping', buttonText: { displayText: '🏓 Ping' }, type: 1 },
                 { buttonId: 'menu', buttonText: { displayText: '📜 Menu' }, type: 1 }
             ],
-            headerType: 4,
-            contextInfo: {
-                externalAdReply: {
-                    title: 'D-XTRO-MD',
-                    body: 'Click here to visit channel',
-                    mediaType: 1,
-                    thumbnailUrl: 'https://i.postimg.cc/44vBQhjF/IMG-20250206-224743.jpg',
-                    mediaUrl: 'https://whatsapp.com/channel/0029Vb0Anqe9RZAcEYc2fT2c'
-                }
-            }
+            headerType: 4
         }, { quoted: mek });
 
     } catch (e) {
         console.error("Error in alive command:", e);
-        reply(`❌ An error occurred: ${e.message}`);
+        reply(`❌ Error occurred: ${e.message}`);
     }
 });
