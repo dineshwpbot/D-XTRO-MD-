@@ -50,29 +50,32 @@ cmd({
         const isAdmin = participants.some(p => p.id === mek.sender && p.admin);
         if (!isAdmin) return conn.sendMessage(from, { text: "🚫 මෙම විධානය භාවිතා කළ හැක්කේ පරිපාලකයින්ට පමණි." });
 
-        conn.sendMessage(from, { text: "✅ *Auto News Activated.*\n\n> *QUEEN-SADU-MD & D-XTRO-MD*" });
+        await conn.sendMessage(from, { text: "✅ *Auto News Activated.*\n\n> *QUEEN-SADU-MD*" });
 
         setInterval(async () => {
             const latestNews = await getLatestNews();
 
             for (const newsItem of latestNews) {
+                // Coming News Message
                 const previewMessage = await conn.sendMessage(from, {
-                    text: "*🔵 Comming News...*\n\n> *QUEEN-SADU-MD*"
+                    text: "*🔵 Coming News...*\n\n> *QUEEN-SADU-MD*"
                 });
 
+                // Edit to Full News After 30 seconds
                 setTimeout(async () => {
                     let fullMessage = {
-                        text: `*🗞️ NEWS ALERT!*\n\n📰 *${newsItem.title}*\n${newsItem.content}\n\n📅 ${newsItem.date}\n\n> *Powered by MR DINESH OFC*`
+                        text: `*🗞️ NEWS ALERT!*\n\n📰 *${newsItem.title}*\n\n${newsItem.content}\n\n📅 ${newsItem.date}\n\n> *Powered by MR DINESH OFC*`
                     };
 
                     if (newsItem.image) {
                         fullMessage['image'] = { url: newsItem.image };
                     }
 
+                    // Edit the same message to show full news
                     await conn.sendMessage(from, fullMessage, { edit: previewMessage.key });
-                }, 30000);
+                }, 30000); // 30 seconds delay
             }
-        }, 900000);
+        }, 900000); // Check every 15 minutes
 
     } catch (err) {
         console.error(`Error in startnews: ${err.message}`);
