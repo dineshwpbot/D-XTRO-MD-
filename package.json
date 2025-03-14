@@ -50,6 +50,8 @@
     "mrnima-moviedl":"1.0.0",
     "hirunews-scrap":"1.1.3",
     "@sl-code-lords/esana-news":"1.0.3",
-    "twilio":"5.4.4"
+    "twilio":"5.4.4",
+    "node-schedule":"2.1.1",
+    "cheerio":"1.0.0"
   }
 }
