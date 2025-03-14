@@ -17,19 +17,19 @@ cmd({
 
         const text = encodeURIComponent(q);
         
-        // ChatGPT Sinhala reply
-        const url = `https://api.dreaded.site/api/chatgpt?text=${text}&lang=si`;
-        const response = await axios.get(url);
-
-        if (!response.data || !response.data.result) {
+        // ChatGPT API Request (Sinhala Response)
+        const gptResponse = await axios.get(`https://api.dreaded.site/api/chatgpt?text=${text}&lang=si`);
+        
+        if (!gptResponse.data || !gptResponse.data.result || !gptResponse.data.result.prompt) {
             return reply("❌ GPT API වෙතින් පිළිතුරක් ලබාගත නොහැක.");
         }
 
-        const gptResponse = response.data.result.prompt;
-        
-        // Voice (Sinhala Female Voice) generation
-        const voiceUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=${encodeURIComponent(gptResponse)}&tl=si-LK`;
-        const voicePath = path.join(__dirname, "gpt_sinhala_voice.mp3");
+        const message = gptResponse.data.result.prompt;
+
+        // Voice (Sinhala Female Voice) Generation
+        const voiceUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=${encodeURIComponent(message)}&tl=si-LK`;
+        const voicePath = path.join(__dirname, "sinhala_female_voice.mp3");
+
         const voiceResponse = await axios({
             method: 'get',
             url: voiceUrl,
@@ -38,11 +38,11 @@ cmd({
 
         voiceResponse.data.pipe(fs.createWriteStream(voicePath));
 
-        // Send Image + Sinhala GPT Reply + Voice
-        const AI_IMAGE = 'https://i.postimg.cc/4y4Bxdc8/Picsart-25-02-08-23-56-16-217.jpg';
-        const formattedInfo = `🤖 *ChatGPT පිළිතුර:* \n\n${gptResponse}`;
-
         await new Promise((resolve) => voiceResponse.data.on('end', resolve));
+
+        // Image and Message Response
+        const AI_IMAGE = 'https://i.postimg.cc/4y4Bxdc8/Picsart-25-02-08-23-56-16-217.jpg';
+        const formattedInfo = `🤖 *ChatGPT පිළිතුර:* \n\n${message}`;
 
         await conn.sendMessage(from, {
             image: { url: AI_IMAGE },
