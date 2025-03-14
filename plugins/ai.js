@@ -26,30 +26,13 @@ cmd({
 
         const message = gptResponse.data.result.prompt;
 
-        // Voice (Sinhala Female Voice) Generation
-        const voiceUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=${encodeURIComponent(message)}&tl=si-LK`;
-        const voicePath = path.join(__dirname, "sinhala_female_voice.mp3");
-
-        const voiceResponse = await axios({
-            method: 'get',
-            url: voiceUrl,
-            responseType: 'stream',
-        });
-
-        voiceResponse.data.pipe(fs.createWriteStream(voicePath));
-
-        await new Promise((resolve) => voiceResponse.data.on('end', resolve));
-
-        // Image and Message Response
+        // Image and Text Reply
         const AI_IMAGE = 'https://i.postimg.cc/4y4Bxdc8/Picsart-25-02-08-23-56-16-217.jpg';
         const formattedInfo = `🤖 *ChatGPT පිළිතුර:* \n\n${message}`;
 
         await conn.sendMessage(from, {
             image: { url: AI_IMAGE },
             caption: formattedInfo,
-            audio: { url: voicePath },
-            mimetype: 'audio/mp4',
-            ptt: true,
             contextInfo: {
                 mentionedJid: [m.sender],
                 forwardingScore: 999,
@@ -61,6 +44,41 @@ cmd({
                 }
             }
         }, { quoted: mek });
+
+        // Voice (Sinhala Female Voice) Generation with Split
+        const splitText = (str, maxLength) => {
+            let result = [];
+            for (let i = 0; i < str.length; i += maxLength) {
+                result.push(str.substring(i, i + maxLength));
+            }
+            return result;
+        };
+
+        const voiceParts = splitText(message, 200); // Google TTS supports max 200 characters
+
+        for (let i = 0; i < voiceParts.length; i++) {
+            const voiceUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=${encodeURIComponent(voiceParts[i])}&tl=si-LK`;
+            const voicePath = path.join(__dirname, `sinhala_voice_part_${i + 1}.mp3`);
+
+            const voiceResponse = await axios({
+                method: 'get',
+                url: voiceUrl,
+                responseType: 'stream',
+            });
+
+            await new Promise((resolve, reject) => {
+                const stream = voiceResponse.data.pipe(fs.createWriteStream(voicePath));
+                stream.on('finish', resolve);
+                stream.on('error', reject);
+            });
+
+            // Send each part of the voice message
+            await conn.sendMessage(from, {
+                audio: { url: voicePath },
+                mimetype: 'audio/mp4',
+                ptt: true,
+            }, { quoted: mek });
+        }
 
     } catch (error) {
         console.error("Error in GPT command:", error);
