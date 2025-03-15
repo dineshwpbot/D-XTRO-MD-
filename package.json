@@ -52,6 +52,7 @@
     "@sl-code-lords/esana-news":"1.0.3",
     "twilio":"5.4.4",
     "node-schedule":"2.1.1",
-    "cheerio":"1.0.0"
+    "cheerio":"1.0.0",
+    "whatsapp-web.js":"1.26.0"
   }
 }
