@@ -1,100 +1,78 @@
 const axios = require('axios');
-const cheerio = require('cheerio');
-const schedule = require('node-schedule');
-const { cmd } = require('../command'); // WhatsApp bot command handler
+const cron = require('node-cron');
+const { Client } = require('whatsapp-web.js');
+const client = new Client();
 
-// Function to fetch horoscope from Hiru FM
-const fetchHoroscope = async () => {
-  try {
-    const { data } = await axios.get('https://astro.hirufm.lk/');
-    const $ = cheerio.load(data);
-    const horoscopes = [];
+const lagnaHoroscopeAPI = "https://www.palapala.lk/daily/";
 
-    $('.daily-horoscope').each((i, elem) => {
-      const sign = $(elem).find('h3').text().trim();
-      const prediction = $(elem).find('p').text().trim();
-      horoscopes.push({ sign, prediction });
-    });
+const lagnaList = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo', 'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'];
 
-    return horoscopes;
-  } catch (error) {
-    console.error('දත්ත සොස් කිරීමේ දෝෂයකි:', error);
-    return [];
-  }
+let autoSendEnabled = false; // Auto-send ක්‍රියාවලියක් සක්‍රීයයි
+
+// Group chat ID දෙකක්
+const groupChatIds = [
+    '120363021938526250@g.us', // පළමු group ID
+    '120363376342659899@g.us'  // දෙවෙනි group ID
+];
+
+const getLagnaHoroscope = async (lagna) => {
+    try {
+        const response = await axios.get(`${lagnaHoroscopeAPI}${lagna}`);
+        return response.data;
+    } catch (error) {
+        console.error("Horoscope data එක ලබා ගැනීමේ දෝෂයක්:", error);
+        return "Horoscope data unavailable.";
+    }
 };
 
-// Function to send horoscope messages to WhatsApp group
-const sendHoroscopes = async (conn, groupId) => {
-  const horoscopes = await fetchHoroscope();
-  horoscopes.forEach(async ({ sign, prediction }) => {
-    const message = `🌞 ඔබට සුබ උදැසනක්... \n\n*${sign}*\n${prediction}\n\nඔබට ජයග්‍රාහී සුබ දවසක්...`;
-    await conn.sendMessage(groupId, { text: message });
-  });
+const sendHoroscope = async (lagna, chatId) => {
+    const horoscope = await getLagnaHoroscope(lagna);
+    client.sendMessage(chatId, horoscope);
 };
 
-// Auto-send the horoscope every day between 6:00 AM - 7:00 AM
-schedule.scheduleJob('0 6 * * *', async () => {
-  const groups = await conn.getChats(); // Get all group chats
-  groups.forEach(async (group) => {
-    if (group.isGroup) {
-      await sendHoroscopes(conn, group.id);
+const handleLagnaCommand = async (msg, lagna) => {
+    const horoscope = await getLagnaHoroscope(lagna);
+    client.sendMessage(msg.from, horoscope);
+};
+
+const startAutoSend = async () => {
+    autoSendEnabled = true;
+    for (let groupId of groupChatIds) {
+        await client.sendMessage(groupId, "ඔබට සුබ දවසක්! Auto-send ලග්න පලාපල ක්‍රියාත්මක වෙයි.");
+        for (let lagna of lagnaList) {
+            await sendHoroscope(lagna, groupId);
+        }
     }
-  });
+};
+
+// ලැබෙන පණිවිඩ අසා
+client.on('message', (msg) => {
+    if (msg.body.startsWith('.lagna')) {
+        const lagna = msg.body.split(' ')[1].toLowerCase();
+        if (lagnaList.includes(lagna)) {
+            handleLagnaCommand(msg, lagna);
+        } else {
+            msg.reply("අවශ්‍ය ලග්නයක් ඇතුලත් කරන්න. උදා: .lagna libra");
+        }
+    }
+
+    // "startinformation" විධානයෙන් auto-send සක්‍රීය කිරීම
+    if (msg.body.toLowerCase() === 'startinformation' && msg.from.includes('@g.us')) {
+        // group chat එකකින්ම startinformation command එක ලැබුණු විට
+        startAutoSend();
+    }
 });
 
-// Command to activate horoscope updates in the group
-cmd({
-  pattern: "startinformation",
-  desc: "Enable daily horoscope updates in this group",
-  isGroup: true,
-  react: "🌟",
-  filename: __filename
-}, async (conn, mek, m, { from, isGroup, participants }) => {
-  try {
-    if (isGroup) {
-      const isAdmin = participants.some(p => p.id === mek.sender && p.admin);
-      const isBotOwner = mek.sender === conn.user.jid;
-
-      if (isAdmin || isBotOwner) {
-        await conn.sendMessage(from, { text: "🇱🇰 *Horoscope Service Activated*.\n\n> QUEEN-SADU-MD & D-XTRO-MD" });
-      } else {
-        await conn.sendMessage(from, { text: "🚫 This command can only be used by group admins or the bot owner." });
-      }
-    } else {
-      await conn.sendMessage(from, { text: "This command can only be used in groups." });
+// auto-send ක්‍රියාවලිය
+cron.schedule('0 6 * * *', async () => {
+    if (autoSendEnabled) {
+        for (let groupId of groupChatIds) {
+            for (let lagna of lagnaList) {
+                await sendHoroscope(lagna, groupId);
+            }
+        }
     }
-  } catch (e) {
-    console.error(`Error in startinformation command: ${e.message}`);
-    await conn.sendMessage(from, { text: "Failed to activate horoscope service." });
-  }
 });
 
-// Command to stop horoscope updates in the group
-cmd({
-  pattern: "stopinformation",
-  desc: "Disable daily horoscope updates in this group",
-  isGroup: true,
-  react: "❌",
-  filename: __filename
-}, async (conn, mek, m, { from, isGroup, participants }) => {
-  try {
-    if (isGroup) {
-      const isAdmin = participants.some(p => p.id === mek.sender && p.admin);
-      const isBotOwner = mek.sender === conn.user.jid;
-
-      if (isAdmin || isBotOwner) {
-        await conn.sendMessage(from, { text: "❌ *Horoscope Service Deactivated.*" });
-
-        // Stop the scheduled job
-        schedule.cancelJob('0 6 * * *');
-      } else {
-        await conn.sendMessage(from, { text: "🚫 This command can only be used by group admins or the bot owner." });
-      }
-    } else {
-      await conn.sendMessage(from, { text: "This command can only be used in groups." });
-    }
-  } catch (e) {
-    console.error(`Error in stopinformation command: ${e.message}`);
-    await conn.sendMessage(from, { text: "Failed to deactivate horoscope service." });
-  }
-});
+// Bot එක ආරම්භ කිරීම
+client.initialize();
