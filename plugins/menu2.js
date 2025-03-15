@@ -1,105 +1,84 @@
-const config = require('../config')
-const {cmd , commands} = require('../command')
+const config = require('../config');
+const { cmd, commands } = require('../command');
+
 cmd({
     pattern: "menu",
     react: "👾",
     desc: "get cmd list",
     category: "main",
     filename: __filename
-},
-async(conn, mek, m,{from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-try{
-let menu = {
-main: '',
-download: '',
-group: '',
-owner: '',
-convert: '',
-search: ''
-};
-
-for (let i = 0; i < commands.length; i++) {
-if (commands[i].pattern && !commands[i].dontAddCommandList) {
-menu[commands[i].category] += `*┋* ${commands[i].pattern}\n`;
- }
-}
-
-let madeMenu = `*╭─────────────────❒⁠⁠⁠⁠*
-
-*⇆ ʜɪɪ ᴍʏ ᴅᴇᴀʀ ғʀɪᴇɴᴅ ⇆*
-
-     *${pushname}*
-
-*┕─────────────────❒*
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━
-   *ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴅ-xᴛʀᴏ-ᴍᴅ ғᴜʟʟ ᴄᴏᴍᴍᴀɴᴅ ʟɪsᴛ*
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-*ᴄʀᴇᴀᴛᴇᴅ ʙʏ ᴍʀ ᴅɪɴᴇꜱʜ*
+}, async (conn, mek, m, { from, pushname, reply }) => {
+    try {
+        // Voice message first
+        await conn.sendMessage(from, { 
+    audio: { url: 'https://github.com/mrdinesh595/Mssadu/raw/refs/heads/main/database/menu.mp3' }, 
+    mimetype: 'audio/mp4', 
+    ptt: true,
+    contextInfo: { 
+        mentionedJid: [m.sender], 
+        forwardingScore: 999, 
+        isForwarded: true, 
+        forwardedNewsletterMessageInfo: { 
+            newsletterJid: '120363354023106128@newsletter', 
+            newsletterName: 'ᴍʀ ᴅɪɴᴇꜱʜ', 
+            serverMessageId: 143 
+        } 
+    } 
+}, { quoted: mek });
 
 
-*╭───────────────❒⁠⁠⁠⁠*
-*│* *_https://github.com/mrdinesh595/QUEEN-SADU-MD*
-*┕───────────────❒*
+        // Command categories
+        let menu = { main: '', download: '', group: '', owner: '', convert: '', search: '' };
+        commands.forEach(cmd => {
+            if (cmd.pattern && !cmd.dontAddCommandList) {
+                menu[cmd.category] += `*┋* ${cmd.pattern}\n`;
+            }
+        });
 
-*╭───────────────❒⁠⁠⁠⁠*
-*│* *❂ᴅᴏᴡɴʟᴏᴀᴅ ᴄᴏᴍᴍᴀɴᴅs❂*
-*┕───────────────❒*
-*╭──────────●●►*
+        let madeMenu = `*👾 ${config.BOT_NAME} COMMAND LIST 👾*
+        
+🔹 *Hi ${pushname}*, welcome!
+🔹 *Created by*: ${config.OWNER_NAME}
+🔹 *Version*: 3.0.0 Beta
+
+📥 *Download Commands*
 ${menu.download}
-*╰──────────●●►*
 
-*╭───────────────❒⁠⁠⁠⁠*
-*│* *❂ᴍᴀɪɴ ᴄᴏᴍᴍᴀɴᴅs❂*
-*┕───────────────❒*
-*╭──────────●●►*
+🔧 *Main Commands*
 ${menu.main}
-*╰──────────●●►*
 
-*╭───────────────❒⁠⁠⁠⁠*
-*│* *❂ɢʀᴏᴜᴘ ᴄᴏᴍᴍᴀɴᴅs❂*
-*┕───────────────❒*
-
-*╭──────────●●►*
+👥 *Group Commands*
 ${menu.group}
-*╰──────────●●►*
 
-*╭───────────────❒⁠⁠⁠⁠*
-*│* *❂ᴏᴡɴᴇʀ ᴄᴏᴍᴍᴀɴᴅs❂*
-*┕───────────────❒*
-
-*╭──────────●●►*
+👑 *Owner Commands*
 ${menu.owner}
-*╰──────────●●►*
 
-*╭───────────────❒⁠⁠⁠⁠*
-*│* *❂ᴄᴏɴᴠᴇʀᴛ ᴄᴏᴍᴍᴀɴᴅs❂*
-*┕───────────────❒*
-
-*╭──────────●●►*
+🎭 *Convert Commands*
 ${menu.convert}
-*╰──────────●●►*
 
-*╭─────────────────❒⁠⁠⁠⁠*
-*│* *❂sᴇᴀʀᴄʜ ᴄᴏᴍᴍᴀɴᴅs❂*
-*┕─────────────────❒*
-
-*╭──────────●●►*
+🔎 *Search Commands*
 ${menu.search}
-*╰──────────●●►*
 
-*❒⁠⁠⁠⁠▭▬▭▬▭▬▭▬▭▬▭▬▭▬▭❒*⁠⁠⁠⁠
+*Powered by ${config.BOT_NAME}*`;
 
-> *ᴘᴏᴡᴇʀᴇᴅ ʙʏ qᴜᴇᴇɴ ꜱᴀᴅᴜ ᴍᴅ*
+        // Send menu with channel view
+        await conn.sendMessage(from, {
+            image: { url: config.ALIVE_IMG }, // Bot image
+            caption: madeMenu,
+            contextInfo: {
+                mentionedJid: [m.sender],
+                forwardingScore: 999,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: '120363354023106128@newsletter',
+                    newsletterName: 'ᴍʀ ᴅɪɴᴇꜱʜ',
+                    serverMessageId: 143
+                }
+            }
+        }, { quoted: mek });
 
-╰━❁ ═══ ❃•⇆•❃ ═══ ❁━╯
-`
-
-await conn.sendMessage(from,{image:{url:config.ALIVE_IMG},caption:madeMenu},{quoted:mek})
-
-}catch(e){
-console.log(e)
-reply(`${e}`)
-}
-})
+    } catch (e) {
+        console.log(e);
+        reply(`${e}`);
+    }
+});
